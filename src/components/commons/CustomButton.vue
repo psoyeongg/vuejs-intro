@@ -3,7 +3,7 @@
     <b-button
       @click="onClick"
       class="button"
-      style="background: tomato; border: none; margin: 3px"
+      style="background: tomato; border: none"
       v-bind:disabled="disabled"
       >{{ title }}</b-button
     >
@@ -21,4 +21,9 @@
   };
 </script>
 
-<style></style>
+<style>
+  .button {
+    width: max-content;
+    margin: 3px;
+  }
+</style>
