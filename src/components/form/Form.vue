@@ -3,27 +3,32 @@
     <div class="title">
       <h1>사용자 정보 입력</h1>
     </div>
-    <div class="content">
-      <b-form @submit="onSubmit">
-        <slot></slot>
-      </b-form>
+    <div v-if="show">
+      <div class="content">
+        <b-form @submit="onSubmit">
+          <slot></slot>
+        </b-form>
+      </div>
+      <div class="footer">
+        <custom-button
+          title="이전"
+          :onClick="prev"
+          :disabled="currentStep === 0"
+        />
+        <custom-button
+          title="다음"
+          :onClick="next"
+          v-if="currentStep < totalSteps - 1"
+        />
+        <custom-button
+          title="전송"
+          :onClick="next"
+          v-if="currentStep === totalSteps - 1"
+        />
+      </div>
     </div>
-    <div class="footer">
-      <custom-button
-        title="이전"
-        :onClick="prev"
-        :disabled="currentStep === 0"
-      />
-      <custom-button
-        title="다음"
-        :onClick="next"
-        v-if="currentStep < totalSteps - 1"
-      />
-      <custom-button
-        title="전송"
-        :onClick="onSubmit"
-        v-if="currentStep === totalSteps - 1"
-      />
+    <div v-else class="content">
+      <pre class="m-0">{{ formData }}</pre>
     </div>
   </div>
 </template>
@@ -31,6 +36,9 @@
 <script>
   import CustomButton from "../commons/CustomButton.vue";
   export default {
+    props: {
+      formData: Object,
+    },
     components: {
       CustomButton,
     },
@@ -39,6 +47,7 @@
         steps: [],
         currentStep: 0,
         totalSteps: 0,
+        show: true,
       };
     },
     mounted() {
@@ -53,16 +62,23 @@
       }
     },
     methods: {
-      onSubmit(event) {
-        event.preventDefault();
+      onSubmit() {
+        this.show = false;
       },
       prev() {
-        console.log("prev");
         this._swtichStep(this.currentStep - 1);
       },
-      next() {
-        console.log("next");
-        this._swtichStep(this.currentStep + 1);
+      async next() {
+        await this.$emit("onNextStep", {
+          element: this.steps[this.currentStep].$slots.default[0],
+        });
+        if (this.steps[this.currentStep].isValid) {
+          if (this.currentStep === this.totalSteps - 1) {
+            this.onSubmit();
+          } else {
+            await this._swtichStep(this.currentStep + 1);
+          }
+        }
       },
       _swtichStep(index) {
         this.steps.forEach((step) => {

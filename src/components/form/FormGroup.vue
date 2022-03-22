@@ -11,11 +11,11 @@
       selected: {
         default: false,
       },
+      isValid: Boolean,
     },
     data() {
       return {
         isActive: false,
-        isValidated: false,
       };
     },
     created() {
